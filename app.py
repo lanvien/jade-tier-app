@@ -1,6 +1,5 @@
 import streamlit as st
 import time
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -41,11 +40,6 @@ def form_page():
 
     st.header("II. SẮC DIỆN")
 
-    color = st.multiselect(
-        "Màu quan sát được",
-        ["Xanh lá", "Tím", "Vàng/Nâu", "Trắng", "Đỏ", "Đen", "Xám", "Xanh dương"]
-    )
-
     color_vibrancy = st.slider("Độ tươi màu", 1, 4, 3)
 
     st.header("III. NỘI TẠI")
@@ -63,4 +57,97 @@ def form_page():
             "structure": structure,
             "translucency": translucency,
             "uniformity": uniformity,
-            "color_vibrancy": color_vibrancy
+            "color_vibrancy": color_vibrancy,
+            "crack": crack,
+            "impurity": impurity,
+            "size": size,
+            "thickness": thickness
+        }
+        st.session_state.page = "loading"
+        st.rerun()
+
+# -----------------------------
+# LOADING PAGE
+# -----------------------------
+def loading_page():
+    st.title("⏳ Đang phân tích cốt ngọc và sắc diện...")
+
+    messages = [
+        "Ngọc dưỡng người 3 năm, người dưỡng ngọc một đời...",
+        "Ngọc Phỉ Thuý càng đeo sẽ càng lên nước và bóng hơn...",
+        "Đang đối chiếu dữ liệu thị trường...",
+        "Đang kiểm tra chứng thư GIV, SJC, Liulab..."
+    ]
+
+    for msg in messages:
+        st.write(msg)
+        time.sleep(1)
+
+    st.session_state.page = "result"
+    st.rerun()
+
+# -----------------------------
+# RESULT PAGE
+# -----------------------------
+def result_page():
+    st.title("✨ GIÁ TRỊ ƯỚC TÍNH CHIẾC VÒNG CỦA BẠN")
+
+    data = st.session_state.data
+
+    # Fake scoring
+    score = (
+        data["uniformity"] * 10 +
+        data["color_vibrancy"] * 15 -
+        data["crack"] * 10 -
+        data["impurity"] * 5
+    )
+
+    min_price = int(5_000_000 + score * 10000)
+    max_price = min_price + 2_500_000
+
+    st.success(f"{min_price:,} VNĐ - {max_price:,} VNĐ")
+
+    # Spider chart
+    categories = ["Độ Trong", "Màu Sắc", "Độ Sạch", "Kích Thước", "Thẩm Mỹ"]
+    values = [
+        data["uniformity"],
+        data["color_vibrancy"],
+        4 - data["impurity"],
+        data["thickness"],
+        3
+    ]
+
+    values += values[:1]
+
+    angles = np.linspace(0, 2*np.pi, len(categories), endpoint=False).tolist()
+    angles += angles[:1]
+
+    fig, ax = plt.subplots(subplot_kw=dict(polar=True))
+    ax.plot(angles, values)
+    ax.fill(angles, values, alpha=0.25)
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(categories)
+    ax.set_yticklabels([])
+
+    st.pyplot(fig)
+
+    col1, col2 = st.columns(2)
+
+    if col1.button("Định giá vòng khác"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    if col2.button("Chia sẻ kết quả"):
+        st.write("Tính năng chia sẻ sẽ cập nhật sau 💎")
+
+# -----------------------------
+# ROUTER
+# -----------------------------
+if st.session_state.page == "home":
+    home_page()
+elif st.session_state.page == "form":
+    form_page()
+elif st.session_state.page == "loading":
+    loading_page()
+elif st.session_state.page == "result":
+    result_page()
