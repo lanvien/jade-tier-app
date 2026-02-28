@@ -1,38 +1,66 @@
 import streamlit as st
+import time
+import random
 import numpy as np
-import joblib
+import matplotlib.pyplot as plt
 
 # -----------------------------
-# Page config
+# SESSION INIT
 # -----------------------------
-st.set_page_config(page_title="Jade Tier Predictor", layout="centered")
-
-st.title("💎 Jade Tier Predictor")
-
-st.write("Enter your stats below to predict your tier.")
+if "page" not in st.session_state:
+    st.session_state.page = "home"
 
 # -----------------------------
-# Input Section
+# HOME PAGE
 # -----------------------------
-games_played = st.number_input("Games Played", min_value=0, value=100)
-win_rate = st.slider("Win Rate (%)", 0, 100, 50)
-avg_kda = st.number_input("Average KDA", min_value=0.0, value=2.5)
+def home_page():
+    st.title("🌿 ĐỊNH GIÁ PHỈ THÚY")
+    st.write("Chỉ dành cho phỉ thuý tự nhiên type A (không xử lý ép nhựa / nhuộm màu).")
+
+    if st.button("Bắt đầu thẩm định ngay"):
+        st.session_state.page = "form"
+        st.rerun()
 
 # -----------------------------
-# Prediction Button
+# FORM PAGE
 # -----------------------------
-if st.button("Predict Tier"):
+def form_page():
+    st.header("I. CỐT NGỌC")
 
-    # Dummy model logic (replace later)
-    score = (win_rate * 0.6) + (avg_kda * 10)
+    structure = st.radio(
+        "Hạt tinh thể ngọc trông thế nào?",
+        ["Đậu", "Nếp mịn", "Nếp băng"]
+    )
 
-    if score > 120:
-        tier = "Diamond"
-    elif score > 90:
-        tier = "Emerald"
-    elif score > 70:
-        tier = "Platinum"
-    else:
-        tier = "Gold"
+    translucency = st.radio(
+        "Chất ngọc trông thế nào?",
+        ["Đục hoàn toàn", "Đục nhẹ", "Xuyên sáng vừa", "Xuyên sáng rõ"]
+    )
 
-    st.success(f"Predicted Tier: {tier}")
+    uniformity = st.slider("Độ đồng đều", 1, 4, 3)
+
+    st.header("II. SẮC DIỆN")
+
+    color = st.multiselect(
+        "Màu quan sát được",
+        ["Xanh lá", "Tím", "Vàng/Nâu", "Trắng", "Đỏ", "Đen", "Xám", "Xanh dương"]
+    )
+
+    color_vibrancy = st.slider("Độ tươi màu", 1, 4, 3)
+
+    st.header("III. NỘI TẠI")
+
+    crack = st.slider("Đường nứt", 0, 3, 0)
+    impurity = st.slider("Tạp chất", 0, 3, 1)
+
+    st.header("IV. KÍCH THƯỚC")
+
+    size = st.number_input("Ni vòng (mm)", value=54)
+    thickness = st.slider("Độ dày cảm nhận", 1, 3, 2)
+
+    if st.button("Phân tích giá trị"):
+        st.session_state.data = {
+            "structure": structure,
+            "translucency": translucency,
+            "uniformity": uniformity,
+            "color_vibrancy": color_vibrancy
