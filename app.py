@@ -1,59 +1,38 @@
 import streamlit as st
+import numpy as np
+import joblib
 
-# ===== Session state setup =====
-if "page" not in st.session_state:
-    st.session_state.page = "welcome"
+# -----------------------------
+# Page config
+# -----------------------------
+st.set_page_config(page_title="Jade Tier Predictor", layout="centered")
 
-if "score" not in st.session_state:
-    st.session_state.score = 0
+st.title("💎 Jade Tier Predictor")
 
-# ===== WELCOME PAGE =====
-if st.session_state.page == "welcome":
-    st.title("💎 Jade Tier Recommendation")
-    st.write("Answer a few questions to find your perfect jade tier!")
+st.write("Enter your stats below to predict your tier.")
 
-    if st.button("Start"):
-        st.session_state.page = "question"
+# -----------------------------
+# Input Section
+# -----------------------------
+games_played = st.number_input("Games Played", min_value=0, value=100)
+win_rate = st.slider("Win Rate (%)", 0, 100, 50)
+avg_kda = st.number_input("Average KDA", min_value=0.0, value=2.5)
 
+# -----------------------------
+# Prediction Button
+# -----------------------------
+if st.button("Predict Tier"):
 
-# ===== QUESTION PAGE =====
-elif st.session_state.page == "question":
-    st.title("Question 1")
+    # Dummy model logic (replace later)
+    score = (win_rate * 0.6) + (avg_kda * 10)
 
-    answer = st.radio(
-        "What matters most to you?",
-        ["Luck & fortune", "Health & protection", "Luxury & status"]
-    )
-
-    if st.button("Next"):
-        if answer == "Luck & fortune":
-            st.session_state.score = 1
-        elif answer == "Health & protection":
-            st.session_state.score = 2
-        else:
-            st.session_state.score = 3
-
-        st.session_state.page = "transition"
-
-
-# ===== TRANSITION PAGE =====
-elif st.session_state.page == "transition":
-    st.title("Analyzing your energy... ✨")
-    st.write("Calculating your jade compatibility...")
-
-    if st.button("See Result"):
-        st.session_state.page = "result"
-
-
-# ===== RESULT PAGE =====
-elif st.session_state.page == "result":
-    st.title("Your Jade Tier 💎")
-
-    if st.session_state.score == 1:
-        st.success("Tier 1: Prosperity Jade")
-    elif st.session_state.score == 2:
-        st.success("Tier 2: Protection Jade")
+    if score > 120:
+        tier = "Diamond"
+    elif score > 90:
+        tier = "Emerald"
+    elif score > 70:
+        tier = "Platinum"
     else:
-        st.success("Tier 3: Imperial Jade")
+        tier = "Gold"
 
-    st.write("Thank you for taking the quiz!")
+    st.success(f"Predicted Tier: {tier}")
